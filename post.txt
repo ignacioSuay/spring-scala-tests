@@ -1,0 +1,9 @@
+How to run Spring integration tests with Scala tests
+
+
+1. Add the scala and scala tests dependencies to the project
+
+[add pom.xml]
+
+2. Create your integration tests
+
