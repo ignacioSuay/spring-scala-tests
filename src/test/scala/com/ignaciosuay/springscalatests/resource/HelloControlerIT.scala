@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(classOf[SpringRunner])
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class HelloResourceIT extends FeatureSpec with GivenWhenThen {
+class HelloControlerIT extends FeatureSpec with GivenWhenThen {
 
   @LocalServerPort
   val randomServerPort: Integer = null
@@ -21,7 +21,9 @@ class HelloResourceIT extends FeatureSpec with GivenWhenThen {
   var testRestTemplate: TestRestTemplate = _
   new TestContextManager(this.getClass).prepareTestInstance(this)
 
-  feature("Hello resource") {
+  val baseUrl = s"http://localhost:$randomServerPort"
+
+  feature("Hello controller") {
 
     scenario("Say hello world!") {
 
@@ -29,7 +31,7 @@ class HelloResourceIT extends FeatureSpec with GivenWhenThen {
       val name = "World"
 
       When("a request to /hello/{name} is sent")
-      val url = s"http://localhost:$randomServerPort/hello/$name"
+      val url = s"$baseUrl/hello/$name"
       val response = testRestTemplate.getForEntity(url, classOf[String])
 
       Then("we get a response with the value Hello World!")
