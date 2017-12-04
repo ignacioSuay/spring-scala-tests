@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.{conten
 
 @RunWith(classOf[SpringRunner])
 @WebMvcTest(Array(classOf[HelloControler]))
-class HelloControlerMvcIT extends FunSuite with GivenWhenThen {
+class HelloControlerMvcTest extends FunSuite with GivenWhenThen {
 
   @Autowired
   var mvc: MockMvc = _
