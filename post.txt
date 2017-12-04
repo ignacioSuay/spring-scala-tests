@@ -5,5 +5,14 @@ How to run Spring integration tests with Scala tests
 
 [add pom.xml]
 
-2. Create your integration tests
+2. Unit testing the controller with @WebMvcTest
 
+If we are only interested in instantiating the web layer, not the whole Spring context, then we could use @WebMvcTest. This annotation will only load configuration relevant to MVC tests (@Controller, @RestController., @ControllerAdvice...) but will disable full auto-configuration (@Component, @Service or @Repository won't be instantiated).
+
+By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (HelloController), so I add  the name of the controller to the annotation.
+
+Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the HelloService by using the @MockBean annotation.
+
+
+
+TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
