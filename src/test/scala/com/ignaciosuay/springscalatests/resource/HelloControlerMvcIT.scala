@@ -35,7 +35,7 @@ class HelloControlerMvcIT extends FunSuite with GivenWhenThen {
     When("a request to /hello/{name} is sent")
     val result = mvc.perform(get(s"/hello/$name").contentType("application/json"))
 
-    Then("get hello world!")
+    Then("expect hello world!")
     result
       .andExpect(status.isOk)
       .andExpect(content().string("Hello World!"))
