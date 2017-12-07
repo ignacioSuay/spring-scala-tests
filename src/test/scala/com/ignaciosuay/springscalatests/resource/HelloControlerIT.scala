@@ -1,7 +1,7 @@
 package com.ignaciosuay.springscalatests.resource
 
 import org.junit.runner.RunWith
-import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.embedded.LocalServerPort
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(classOf[SpringRunner])
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class HelloControlerIT extends FeatureSpec with GivenWhenThen {
+class HelloControlerIT extends FeatureSpec with GivenWhenThen with Matchers {
 
   @LocalServerPort
   val randomServerPort: Integer = null
@@ -34,8 +34,8 @@ class HelloControlerIT extends FeatureSpec with GivenWhenThen {
       val url = s"$baseUrl/hello/$name"
       val response = testRestTemplate.getForEntity(url, classOf[String])
 
-      Then("we get a response with the value Hello World!")
-      assert(response.getBody === "Hello World!")
+      Then("we get a response with the value: Hello World!")
+      response.getBody shouldBe "Hello World!"
     }
 
   }
