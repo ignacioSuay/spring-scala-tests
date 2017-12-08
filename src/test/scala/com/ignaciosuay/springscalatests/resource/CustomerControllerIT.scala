@@ -1,5 +1,6 @@
 package com.ignaciosuay.springscalatests.resource
 
+import com.ignaciosuay.springscalatests.model.Customer
 import org.junit.runner.RunWith
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(classOf[SpringRunner])
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class HelloControlerIT extends FeatureSpec with GivenWhenThen with Matchers {
+class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers {
 
   @LocalServerPort
   val randomServerPort: Integer = null
@@ -23,19 +24,21 @@ class HelloControlerIT extends FeatureSpec with GivenWhenThen with Matchers {
 
   val baseUrl = s"http://localhost:$randomServerPort"
 
-  feature("Hello controller") {
+  feature("Customer controller") {
 
-    scenario("Say hello world!") {
+    scenario("Find customer by id") {
 
-      Given("a name")
-      val name = "World"
+      Given("a customer id")
+      val id = 1
 
-      When("a request to /hello/{name} is sent")
-      val url = s"$baseUrl/hello/$name"
-      val response = testRestTemplate.getForEntity(url, classOf[String])
+      When("a request to /customers/{id} is sent")
+      val url = s"$baseUrl/customers/$id"
+      val response = testRestTemplate.getForEntity(url, classOf[Customer])
 
-      Then("we get a response with the value: Hello World!")
-      response.getBody shouldBe "Hello World!"
+      Then("we get a response with the customer in the body")
+      response.getBody.getId shouldBe 1
+      response.getBody.getName shouldBe "Bob"
+
     }
 
   }
