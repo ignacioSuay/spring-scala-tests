@@ -16,38 +16,37 @@ I am building this project with Maven so the pom.xml file looks like:
 
 ## Sample Controller and service
 
-In order to have a controller to test, I need to create a simple Hello Rest controller which which given a name calls a HelloService.
+In order to have a controller to test, I need to create a simple Customer Rest controller which which given a customer id calls findCustomer in the CustomerService.
 
-Here is the HelloController:
-
-[add code]
-
-And the HelloService:
+Here is the CustomerController:
 
 [add code]
 
+And the CustomerService:
+
+[add code]
 
 ## Unit testing the controller with @WebMvcTest
 
 The first that we want to test is the Controller in isolation.
 
-As you can see in the HelloController, this class has a dependency in the HelloService.
-For the unit test we are going to mock the HelloService using the @MockBean annotation provided by Spring.
+As you can see in the CustomerController, this class has a dependency to the CustomerService.
+For the unit test we are going to mock the CustomerService using the @MockBean annotation provided by Spring.
 
 Spring provides the @WebMvcTest annotation which is very useful when you are only interested in instantiating the web layer and not the whole Spring context.
 This annotation will only load configuration relevant to MVC tests (@Controller, @RestController., @ControllerAdvice...) but will disable full auto-configuration (@Component, @Service or @Repository won't be instantiated).
 
-Here are the steps thatI followed:
+Here are the steps that I followed:
 
-1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[HelloControler]))
+1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[CustomerControler]))
 
 2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.
 
 3. A
 
-By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (HelloController), so I add  the name of the controller to the annotation.
+By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerControler), so I add  the name of the controller to the annotation.
 
-Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the HelloService by using the @MockBean annotation.
+Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
 
 
 TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
