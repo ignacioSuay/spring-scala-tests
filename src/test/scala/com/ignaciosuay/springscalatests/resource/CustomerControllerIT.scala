@@ -15,12 +15,12 @@ import org.springframework.test.context.junit4.SpringRunner
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers {
 
-  @LocalServerPort
-  val randomServerPort: Integer = null
-
   @Autowired
   var testRestTemplate: TestRestTemplate = _
   new TestContextManager(this.getClass).prepareTestInstance(this)
+
+  @LocalServerPort
+  val randomServerPort: Integer = null
 
   val baseUrl = s"http://localhost:$randomServerPort"
 
