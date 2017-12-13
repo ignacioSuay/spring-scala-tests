@@ -1,32 +1,157 @@
-Testing in Spring boot with Scala tests
+<h3>Introduction</h3>
 
-Spring boot tests provides great support for testing which combined with the sugar syntax form scala tests makes testing more pleasant and less verbose.
+Spring boot tests provides great support for testing which combined with the sugar syntax form Scala makes testing more pleasant and less verbose.
 
-Please find all the code used in this post in github (https://github.com/ignacioSuay/spring-scala-tests)
+<h3>Dependencies</h3>
 
-## Dependencies
+We will need to add the following dependencies to our project: Spring boot, Scala and ScalaTests,
 
-We will need to add the following dependencies to our project:Spring boot, Scala and ScalaTests,
-
-As the ScalaTest documentation(http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
+As the ScalaTest documentation (http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
 
 I am building this project with Maven so the pom.xml file looks like:
 
-[add pom.xml]
+[xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-## Sample Controller and service
+    <groupId>com.ignaciosuay</groupId>
+    <artifactId>spring-scala-tests</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>spring-scala-tests</name>
+    <description>Demo project for Spring Boot</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.8.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <scala.version>2.11.8</scala.version>
+        <scala-test.version>3.0.1</scala-test.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>${scala-test.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- disable surefire for scala tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+[/xml]
+
+<h3>Sample Controller and service</h3>
 
 In order to have a controller to test, I need to create a simple Customer Rest controller which which given a customer id calls findCustomer in the CustomerService.
 
 Here is the CustomerController:
 
-[add code]
+[java]
+@RestController
+@RequiredArgsConstructor
+public class CustomerController {
+
+    private final CustomerService customerService;
+
+    @GetMapping("/customers/{id}")
+    public Customer getCustomer(@PathVariable Long id){
+        return customerService.findCustomer(id);
+    }
+}
+
+[/java]
 
 And the CustomerService:
 
-[add code]
+[java]
+@Service
+public class CustomerService {
 
-## Unit testing the controller with @WebMvcTest
+    public Customer findCustomer(Long id) {
+        return new Customer(id, "Bob");
+    }
+}
+[/java]
+
+<h3> Unit testing the controller with @WebMvcTest </h3>
 
 The first that we want to test is the Controller in isolation.
 
@@ -40,23 +165,76 @@ Here are the steps that I followed:
 
 1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[CustomerControler]))
 
-2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I add  the name of the controller to the annotation.
+2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I add the name of the controller to the annotation.
 
 3. Mock the customer service. Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
 
 4. Load the application context by defining a TestContextManager instance. TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
 
+and here is the code:
 
-## Integration testing with SpringBootTests
+[java]
+package com.ignaciosuay.springscalatests.resource
+
+import com.ignaciosuay.springscalatests.model.Customer
+import com.ignaciosuay.springscalatests.service.CustomerService
+import org.junit.runner.RunWith
+import org.mockito.Mockito._
+import org.scalatest.{FunSuite, GivenWhenThen}
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.TestContextManager
+import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.{content, status}
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.hamcrest.Matchers.is
+
+
+@RunWith(classOf[SpringRunner]) //1
+@WebMvcTest(Array(classOf[CustomerController]))
+class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
+
+  @Autowired //2
+  var mvc: MockMvc = _
+
+  @MockBean //3
+  val customerService: CustomerService = null
+
+  new TestContextManager(this.getClass).prepareTestInstance(this) //4
+
+  test("test find a customer") {
+
+    Given("a customer id")
+    val id = 1l
+    val expectedCustomer = new Customer(id, "Bob")
+    when(customerService.findCustomer(id)).thenReturn(expectedCustomer)
+
+    When("a request to /customers/{id} is sent")
+    val result = mvc.perform(get(s"/customers/$id").contentType("application/json"))
+
+    Then("expect a customer")
+    result
+      .andExpect(status.isOk)
+      .andExpect(jsonPath("$.id", is(1)))
+      .andExpect(jsonPath("$.name", is(expectedCustomer.getName)))
+  }
+
+}
+[/java]
+
+<h3>Integration testing with SpringBootTests</h3>
 
 In this section, we will go over creating an integration test using SpringBootTest and TestRestTemplate.
 
 TestRestTemplate is a convenient alternative of RestTemplate that is suitable for integration tests
 
 The difference between SpringBootTest and WebMvcTest is that SpringBootTest will start your full application context and the application server (like tomcat).
- While WebMvcTest will only scan you have defined and therefore it is much faster.
+While WebMvcTest will only scan you have defined and therefore it is much faster.
 
-1) Annotate the test class with:  @RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT).
+1) Annotate the test class with: @RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT).
 As you can see in the annotation we will start the Tomcat application server using a random port.
 
 2) Autowired a TestRestTemplate class
@@ -68,8 +246,54 @@ As you can see in the annotation we will start the Tomcat application server usi
 5) Create your test and test the endpoint using testRestTemplate.
 In this case, I am using the getForEntity method which retrieves a Customer by doing a GET request on the specified URL.
 
+and the code:
+[java]
+package com.ignaciosuay.springscalatests.resource
 
-## Summary
+import com.ignaciosuay.springscalatests.model.Customer
+import org.junit.runner.RunWith
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.embedded.LocalServerPort
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.test.context.TestContextManager
+import org.springframework.test.context.junit4.SpringRunner
+
+@RunWith(classOf[SpringRunner])
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers {
+
+  @Autowired
+  var testRestTemplate: TestRestTemplate = _
+  new TestContextManager(this.getClass).prepareTestInstance(this)
+
+  @LocalServerPort
+  val randomServerPort: Integer = null
+
+  val baseUrl = s"http://localhost:$randomServerPort"
+
+  feature("Customer controller") {
+
+    scenario("Find customer by id") {
+
+      Given("a customer id")
+      val id = 1
+
+      When("a request to /customers/{id} is sent")
+      val url = s"$baseUrl/customers/$id"
+      val response = testRestTemplate.getForEntity(url, classOf[Customer])
+
+      Then("we get a response with the customer in the body")
+      response.getBody.getId shouldBe 1
+      response.getBody.getName shouldBe "Bob"
+    }
+  }
+}
+[/java]
+
+<h3>Summary</h3>
 
 In this post, we implemented a unit test and an integration test using Spring boot and Scala Tests.
 I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide.
@@ -80,27 +304,14 @@ For instance, I could create a fixture for my customer like:
 
 object CustomerFixture {
 
-  def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
+def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
 
 }
 
 which then I could use in any of my tests like:
-aCustomer() -> which will use the default values (id = 1 and name = 100)
-aCustomer(name= "Mike") -> which will have id 1 and name Mike
-aCustomer(100, "Mike") -> which will result in id 100 and name Mike
+aCustomer() -&gt; which will use the default values (id = 1 and name = 100)
+aCustomer(name= "Mike") -&gt; which will have id 1 and name Mike
+aCustomer(100, "Mike") -&gt; which will result in id 100 and name Mike
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<h3>Code</h3>
+Please find all the code used in this post in <a href="https://github.com/ignacioSuay/spring-scala-tests">github</a>
