@@ -17,17 +17,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.hamcrest.Matchers.is
 
 
-@RunWith(classOf[SpringRunner])
+@RunWith(classOf[SpringRunner]) //1
 @WebMvcTest(Array(classOf[CustomerController]))
 class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
 
-  @Autowired
+  @Autowired //2
   var mvc: MockMvc = _
 
-  @MockBean
+  @MockBean //3
   val customerService: CustomerService = null
 
-  new TestContextManager(this.getClass).prepareTestInstance(this)
+  new TestContextManager(this.getClass).prepareTestInstance(this) //4
 
   test("test find a customer") {
 
