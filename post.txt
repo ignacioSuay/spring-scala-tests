@@ -40,13 +40,45 @@ Here are the steps that I followed:
 
 1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[CustomerControler]))
 
-2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.
+2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I add  the name of the controller to the annotation.
 
-3. A
+3. Mock the customer service. Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
 
-By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerControler), so I add  the name of the controller to the annotation.
-
-Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
+4. Load the application context by defining a TestContextManager instance. TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
 
 
-TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
+## Integration testing with SpringBootTests
+
+In this section, we will go over creating an integration test using SpringBootTest and TestRestTemplate.
+
+TestRestTemplate is a convenient alternative of RestTemplate that is suitable for integration tests
+
+The difference between SpringBootTest and WebMvcTest is that SpringBootTest will start your full application context and the application server (like tomcat).
+ While WebMvcTest will only scan you have defined and therefore it is much faster.
+
+1) Annotate the test class with:  @RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT).
+As you can see in the annotation we will start the Tomcat application server using a random port.
+
+2) Autowired a TestRestTemplate class
+
+3) Because we are starting tomcat using a random port we need to inject the port using the @LocalServerPort annotation.
+
+4) Now we can build the url using the random port value.
+
+5) Create your test and test the endpoint using testRestTemplate.
+In this case, I am using the getForEntity method which retrieves a Customer by doing a GET request on the specified URL.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
