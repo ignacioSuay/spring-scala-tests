@@ -69,6 +69,28 @@ As you can see in the annotation we will start the Tomcat application server usi
 In this case, I am using the getForEntity method which retrieves a Customer by doing a GET request on the specified URL.
 
 
+## Summary
+
+In this post, we implemented a unit test and an integration test using Spring boot and Scala Tests.
+I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide.
+
+One of the main reasons, I prefer to use any other JVM language is because allows me to create fixture with named and default parameters.
+
+For instance, I could create a fixture for my customer like:
+
+object CustomerFixture {
+
+  def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
+
+}
+
+which then I could use in any of my tests like:
+aCustomer() -> which will use the default values (id = 1 and name = 100)
+aCustomer(name= "Mike") -> which will have id 1 and name Mike
+aCustomer(100, "Mike") -> which will result in id 100 and name Mike
+
+
+
 
 
 
