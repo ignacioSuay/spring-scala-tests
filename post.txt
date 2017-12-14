@@ -8,7 +8,7 @@ We will need to add the following dependencies to our project: Spring boot, Scal
 
 As the ScalaTest documentation (http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
 
-I am building this project with Maven so the pom.xml file looks like:
+As we are building this project using maven, the result pom looks like:
 
 [xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -139,7 +139,8 @@ public class CustomerController {
 
 [/java]
 
-And the CustomerService:
+In a real case scenario the CustomerService will use a repository to query the customer from a database.
+In order to make this article as simple as possible the CustomerService will always return the same customer with id=1 and name="Bob".
 
 [java]
 @Service
