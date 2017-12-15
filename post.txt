@@ -6,9 +6,9 @@ In this article we will build a Rest Controller build in Java with Spring Boot a
 
 <h3>Dependencies</h3>
 
-We will need to add the following dependencies to our project: Spring boot, Scala and ScalaTests,
+We will need to add the following dependencies to our project: <strong>Spring boot, Scala and ScalaTest.</strong>
 
-As we are building this project using maven, the project pom looks like:
+As we are building this project using maven, the pom file looks like:
 
 [xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -118,11 +118,11 @@ As we are building this project using maven, the project pom looks like:
 
 [/xml]
 
-As the ScalaTest documentation (http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
+As the <a href="http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin">ScalaTest documentation</a> recommends we should disable the surefire plugin.
 
 <h3>Sample Controller and service</h3>
 
-In order to have a controller to test, I need to create a simple Customer Rest controller which which given a customer id calls findCustomer in the CustomerService.
+In order to have a controller to test, we will create a simple Customer Rest controller which given a customer id calls the findCustomer method in the CustomerService.
 
 Here is the CustomerController:
 
@@ -156,24 +156,30 @@ public class CustomerService {
 
 <h3> Unit testing the controller with @WebMvcTest </h3>
 
-The first that we may want to test is the Controller in isolation.
+The first that we may want to test is the Controller in isolation. As you can see in the CustomerController, this class has a dependency to the CustomerService.
 
-As you can see in the CustomerController, this class has a dependency to the CustomerService.
-For the unit test we are going to mock the CustomerService using the @MockBean annotation provided by Spring.
+For the unit test we are going to mock the CustomerService using the <strong>@MockBean</strong> annotation provided by Spring.
 
-Spring provides the @WebMvcTest annotation which is very useful when you are only interested in instantiating the web layer and not the whole Spring context.
+Spring provides the <strong>@WebMvcTest</strong> annotation which is very useful when you are <strong>only interested in instantiating the web layer and not the whole Spring context</strong>.
 This annotation will only load configuration relevant to MVC tests (@Controller, @RestController., @ControllerAdvice...) but will disable full auto-configuration (@Component, @Service or @Repository won't be instantiated).
 
 Here are the steps that I followed:
 
-1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[CustomerControler]))
+<ol>
+<li>
+Annotate the class with: <strong>@RunWith(classOf[SpringRunner])</strong> and <strong>@WebMvcTest(Array(classOf[CustomerControler]))</strong></li>
 
-2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container. By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I added the name of the controller to the annotation.
+<li>
+<strong>Autowired MockMvc</strong>. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container. By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I added the name of the controller to the annotation.
+</li>
 
-3. Mock the customer service. Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
 
-4. Load the application context by defining a TestContextManager instance. TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
+<li> Mock the customer service. Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the <strong>@MockBean</strong> annotation.
+</li>
 
+<li> Load the application context by defining a <strong>TestContextManager</strong> instance. TestContextManager is the main entry point into the Spring TestContext Framework, which provides support for loading and accessing application contexts, dependency injection of test instances, transactional execution of test methods, etc.
+</li>
+</ul>
 and here is the code:
 
 [java]
@@ -208,7 +214,7 @@ class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
 
   new TestContextManager(this.getClass).prepareTestInstance(this) //4
 
-  test("test find a customer") {
+  test("find a customer") {
 
     Given("a customer id")
     val id = 1l
@@ -230,25 +236,25 @@ class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
 
 <h3>Integration testing with SpringBootTests</h3>
 
-In this section, we will go over creating an integration test using SpringBootTest and TestRestTemplate.
+In this section, we will go over creating an integration test using <strong>SpringBootTest</strong> and <strong>TestRestTemplate</strong>.
 
-TestRestTemplate is a convenient alternative of RestTemplate that is suitable for integration tests
+TestRestTemplate is a convenient alternative of RestTemplate that is suitable for integration tests.
 
-The difference between SpringBootTest and WebMvcTest is that SpringBootTest will start your full application context and the application server (like tomcat).
+The difference between <strong>SpringBootTest</strong> and <strong>WebMvcTest</strong> is that SpringBootTest will start your full application context and the application server (tomcat).
 While WebMvcTest will only scan you have defined and therefore it is much faster.
 
 Please follow these steps:
 
-1) Annotate the test class with: @RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT).
+1) Annotate the test class with: <strong>@RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT)</strong>.
 As you can see in the annotation we will start the Tomcat application server using a random port.
 
-2) Autowired a TestRestTemplate class
+2) Autowired TestRestTemplate.
 
-3) Because we are starting tomcat using a random port we need to inject the port using the @LocalServerPort annotation.
+3) Because we are starting tomcat using a random port we need to inject the port using the <strong>@LocalServerPort</strong> annotation.
 
-4) Now we can build the url using the random port value.
+4) Build the url using the random port value.
 
-5) Create your test and test the endpoint using testRestTemplate.
+5) Test the endpoint using <strong>testRestTemplate</strong>.
 In this case, I am using the getForEntity method which retrieves a Customer by doing a GET request on the specified URL.
 
 and the code:
@@ -301,23 +307,25 @@ class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers 
 
 <h3>Summary</h3>
 
-In this post, we implemented a unit test and an integration test using Spring boot and Scala Tests.
+In this post, we implemented a unit test and an integration test using Spring boot and Scala Test.
+
 I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide you.
 
-One of the main reasons, I prefer to use any other JVM language is because allows me to create fixture with named and default parameters.
-
-For instance, I could create a fixture for my customer like:
-
+One of the main reasons, I prefer to use any other JVM language is because allows me to create fixture with named and default parameters. For instance, I could create a fixture for my customer like:
+[java]
 object CustomerFixture {
 
 def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
 
 }
-
+[/java]
 which then I could use in any of my tests like:
-aCustomer() - which will use the default values (id = 1 and name = 100)
-aCustomer(name = "Mike") - which will have id 1 and name Mike
-aCustomer(100, "Mike") - which will result in id 100 and name Mike
+
+[java]
+aCustomer()  //returns a customer with the default values (id = 1 and name = 100)
+aCustomer(name = "Mike") //returns a customer with id 1 and name Mike
+aCustomer(100, "Mike")  // returns a customer with id 100 and name Mike
+[/java]
 
 <h3>Code</h3>
 Please find all the code used in this post in <a href="https://github.com/ignacioSuay/spring-scala-tests">github</a>
