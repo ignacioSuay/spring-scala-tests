@@ -2,13 +2,13 @@
 
 Spring boot tests provides great support for testing which combined with the sugar syntax form Scala makes testing more pleasant and less verbose.
 
+In this article we will build a Rest Controller build in Java with Spring Boot and we will learn how to tested with ScalaTest.
+
 <h3>Dependencies</h3>
 
 We will need to add the following dependencies to our project: Spring boot, Scala and ScalaTests,
 
-As the ScalaTest documentation (http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
-
-As we are building this project using maven, the result pom looks like:
+As we are building this project using maven, the project pom looks like:
 
 [xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -118,6 +118,8 @@ As we are building this project using maven, the result pom looks like:
 
 [/xml]
 
+As the ScalaTest documentation (http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin) recommends we should disable the surefire plugin.
+
 <h3>Sample Controller and service</h3>
 
 In order to have a controller to test, I need to create a simple Customer Rest controller which which given a customer id calls findCustomer in the CustomerService.
@@ -154,7 +156,7 @@ public class CustomerService {
 
 <h3> Unit testing the controller with @WebMvcTest </h3>
 
-The first that we want to test is the Controller in isolation.
+The first that we may want to test is the Controller in isolation.
 
 As you can see in the CustomerController, this class has a dependency to the CustomerService.
 For the unit test we are going to mock the CustomerService using the @MockBean annotation provided by Spring.
@@ -166,7 +168,7 @@ Here are the steps that I followed:
 
 1. Annotate the class with: @RunWith(classOf[SpringRunner]) and @WebMvcTest(Array(classOf[CustomerControler]))
 
-2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container.By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I add the name of the controller to the annotation.
+2. Autowired MockMvc. Note that @WebMvcTest auto-configures MockMvc without needing to start a web container. By default, @WebMvcTest loads all the controllers but in this case I am just interested in loading 1 controller (CustomerController), so I added the name of the controller to the annotation.
 
 3. Mock the customer service. Due to the fact that @WebMvcTest doesn't load any @Service configuration, we need to mock the CustomerService by using the @MockBean annotation.
 
@@ -235,6 +237,8 @@ TestRestTemplate is a convenient alternative of RestTemplate that is suitable fo
 The difference between SpringBootTest and WebMvcTest is that SpringBootTest will start your full application context and the application server (like tomcat).
 While WebMvcTest will only scan you have defined and therefore it is much faster.
 
+Please follow these steps:
+
 1) Annotate the test class with: @RunWith(classOf[SpringRunner]) and @SpringBootTest(webEnvironment = RANDOM_PORT).
 As you can see in the annotation we will start the Tomcat application server using a random port.
 
@@ -248,6 +252,7 @@ As you can see in the annotation we will start the Tomcat application server usi
 In this case, I am using the getForEntity method which retrieves a Customer by doing a GET request on the specified URL.
 
 and the code:
+
 [java]
 package com.ignaciosuay.springscalatests.resource
 
@@ -297,7 +302,7 @@ class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers 
 <h3>Summary</h3>
 
 In this post, we implemented a unit test and an integration test using Spring boot and Scala Tests.
-I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide.
+I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide you.
 
 One of the main reasons, I prefer to use any other JVM language is because allows me to create fixture with named and default parameters.
 
@@ -310,9 +315,9 @@ def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
 }
 
 which then I could use in any of my tests like:
-aCustomer() -&gt; which will use the default values (id = 1 and name = 100)
-aCustomer(name= "Mike") -&gt; which will have id 1 and name Mike
-aCustomer(100, "Mike") -&gt; which will result in id 100 and name Mike
+aCustomer() - which will use the default values (id = 1 and name = 100)
+aCustomer(name = "Mike") - which will have id 1 and name Mike
+aCustomer(100, "Mike") - which will result in id 100 and name Mike
 
 <h3>Code</h3>
 Please find all the code used in this post in <a href="https://github.com/ignacioSuay/spring-scala-tests">github</a>
