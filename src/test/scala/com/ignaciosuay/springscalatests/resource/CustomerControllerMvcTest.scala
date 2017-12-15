@@ -29,7 +29,7 @@ class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
 
   new TestContextManager(this.getClass).prepareTestInstance(this) //4
 
-  test("test find a customer") {
+  test("find a customer") {
 
     Given("a customer id")
     val id = 1l
