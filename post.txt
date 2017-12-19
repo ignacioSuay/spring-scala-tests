@@ -2,13 +2,13 @@
 
 Spring boot tests provides great support for testing which combined with the sugar syntax form Scala makes testing more pleasant and less verbose.
 
-In this article we will build a Rest Controller build in Java with Spring Boot and we will learn how to tested with ScalaTest.
+In this article we will build a Rest Controller build in Java with Spring Boot and we will learn how to test it with ScalaTest.
 
 <h3>Dependencies</h3>
 
 We will need to add the following dependencies to our project: <strong>Spring boot, Scala and ScalaTest.</strong>
 
-As we are building this project using maven, the pom file looks like:
+As we are building this project using Maven, the pom file looks like this:
 
 [xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -118,11 +118,11 @@ As we are building this project using maven, the pom file looks like:
 
 [/xml]
 
-As the <a href="http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin">ScalaTest documentation</a> recommends we should disable the surefire plugin.
+As recommended by the <a href="http://www.scalatest.org/user_guide/using_the_scalatest_maven_plugin">ScalaTest documentation</a>, we should disable the surefire plugin.
 
 <h3>Sample Controller and service</h3>
 
-In order to have a controller to test, we will create a simple Customer Rest controller which given a customer id calls the findCustomer method in the CustomerService.
+In order to have a controller to test, we will create a simple Customer Rest controller which, given a customer id, calls the findCustomer method in the CustomerService.
 
 Here is the CustomerController:
 
@@ -156,12 +156,12 @@ public class CustomerService {
 
 <h3> Unit testing the controller with @WebMvcTest </h3>
 
-The first that we may want to test is the Controller in isolation. As you can see in the CustomerController, this class has a dependency to the CustomerService.
+The first thing that we may want to test is the Controller in isolation. As you can see in the CustomerController, this class has a dependency to the CustomerService.
 
 For the unit test we are going to mock the CustomerService using the <strong>@MockBean</strong> annotation provided by Spring.
 
 Spring provides the <strong>@WebMvcTest</strong> annotation which is very useful when you are <strong>only interested in instantiating the web layer and not the whole Spring context</strong>.
-This annotation will only load configuration relevant to MVC tests (@Controller, @RestController., @ControllerAdvice...) but will disable full auto-configuration (@Component, @Service or @Repository won't be instantiated).
+This annotation will only load configurations relevant to MVC tests (@Controller, @RestController., @ControllerAdvice...) but will disable full auto-configuration (@Component, @Service or @Repository won't be instantiated).
 
 Here are the steps that I followed:
 
@@ -212,7 +212,8 @@ class CustomerControllerMvcTest extends FunSuite with GivenWhenThen {
   @MockBean //3
   val customerService: CustomerService = null
 
-  new TestContextManager(this.getClass).prepareTestInstance(this) //4
+  //4
+  new TestContextManager(this.getClass).prepareTestInstance(this)
 
   test("find a customer") {
 
@@ -240,8 +241,7 @@ In this section, we will go over creating an integration test using <strong>Spri
 
 TestRestTemplate is a convenient alternative of RestTemplate that is suitable for integration tests.
 
-The difference between <strong>SpringBootTest</strong> and <strong>WebMvcTest</strong> is that SpringBootTest will start your full application context and the application server (tomcat).
-While WebMvcTest will only scan you have defined and therefore it is much faster.
+The difference between <strong>SpringBootTest</strong> and <strong>WebMvcTest</strong> is that while SpringBootTest will start your full application context and the application server (tomcat), WebMvcTest will only load the controllers you have defined and therefore it is much faster.
 
 Please follow these steps:
 
@@ -309,9 +309,9 @@ class CustomerControllerIT extends FeatureSpec with GivenWhenThen with Matchers 
 
 In this post, we implemented a unit test and an integration test using Spring boot and Scala Test.
 
-I personally find writing tests with Java to verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide you.
+I personally find writing tests with Java too verbose and I like the sugar syntax that other languages like Scala, Groovy or Kotlin provide.
 
-One of the main reasons, I prefer to use any other JVM language is because allows me to create fixture with named and default parameters. For instance, I could create a fixture for my customer like:
+One of the main reasons I prefer to use any other JVM language is because they allow me to create fixtures with named and default parameters. For instance, I could create a fixture for my customer, such as:
 [java]
 object CustomerFixture {
 
@@ -319,7 +319,7 @@ def aCustomer(id: Long = 1, name: String = "Bob") = new Customer(id, name)
 
 }
 [/java]
-which then I could use in any of my tests like:
+which then I could use in any of my tests, such as:
 
 [java]
 aCustomer()  //returns a customer with the default values (id = 1 and name = 100)
